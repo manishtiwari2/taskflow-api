@@ -1,4 +1,5 @@
 import pytest
+from django.core.cache import cache
 from rest_framework.test import APIClient
 
 from accounts.models import User
@@ -12,6 +13,12 @@ PASSWORD = "StrongPass123!"
 def fast_password_hasher(settings):
     # The default hasher is slow on purpose, which makes tests crawl
     settings.PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
+
+
+@pytest.fixture(autouse=True)
+def clear_cache():
+    # Throttle counters live in the cache and must not leak between tests
+    cache.clear()
 
 
 @pytest.fixture
