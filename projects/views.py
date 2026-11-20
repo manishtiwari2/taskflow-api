@@ -14,7 +14,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         # Non-members get 404 because the project is not in their queryset
-        return Project.objects.for_user(self.request.user)
+        # prefetch members: one extra query instead of one per project (N+1)
+        return Project.objects.for_user(self.request.user).prefetch_related("members")
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
