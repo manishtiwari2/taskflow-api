@@ -17,11 +17,17 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import include, path
+from rest_framework.routers import DefaultRouter
 
 from core.views import health
+from projects.views import ProjectViewSet
+
+router = DefaultRouter()
+router.register("projects", ProjectViewSet, basename="project")
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/health/", health),
     path("api/v1/auth/", include("accounts.urls")),
+    path("api/v1/", include(router.urls)),
 ]
