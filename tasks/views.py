@@ -8,6 +8,8 @@ from .serializers import TaskSerializer
 
 
 class TaskViewSet(viewsets.ModelViewSet):
+    # Placeholder so the API docs can find the model; see get_queryset
+    queryset = Task.objects.none()
     serializer_class = TaskSerializer
     filterset_class = TaskFilter
     search_fields = ["title", "description"]

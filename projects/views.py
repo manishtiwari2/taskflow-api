@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -9,6 +10,8 @@ from .serializers import MemberSerializer, ProjectSerializer
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
+    # Placeholder so the API docs can find the model; see get_queryset
+    queryset = Project.objects.none()
     serializer_class = ProjectSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
@@ -20,6 +23,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
+    @extend_schema(
+        request=MemberSerializer,
+        responses={200: ProjectSerializer, 204: None},
+    )
     @action(detail=True, methods=["post", "delete"])
     def members(self, request, pk=None):
         project = self.get_object()
