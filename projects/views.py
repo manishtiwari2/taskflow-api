@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -9,16 +10,23 @@ from .serializers import MemberSerializer, ProjectSerializer
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
+    # Placeholder so the API docs can find the model; see get_queryset
+    queryset = Project.objects.none()
     serializer_class = ProjectSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_queryset(self):
         # Non-members get 404 because the project is not in their queryset
-        return Project.objects.for_user(self.request.user)
+        # prefetch members: one extra query instead of one per project (N+1)
+        return Project.objects.for_user(self.request.user).prefetch_related("members")
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
+    @extend_schema(
+        request=MemberSerializer,
+        responses={200: ProjectSerializer, 204: None},
+    )
     @action(detail=True, methods=["post", "delete"])
     def members(self, request, pk=None):
         project = self.get_object()

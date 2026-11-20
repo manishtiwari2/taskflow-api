@@ -33,7 +33,8 @@ def test_list_shows_only_tasks_from_my_projects(as_user, task, outsider):
     other = Project.objects.create(name="Other", owner=outsider)
     Task.objects.create(project=other, title="Hidden", created_by=outsider)
 
-    titles = [t["title"] for t in as_user(task.created_by).get(LIST_URL).json()]
+    results = as_user(task.created_by).get(LIST_URL).json()["results"]
+    titles = [t["title"] for t in results]
 
     assert titles == ["Write docs"]
 
