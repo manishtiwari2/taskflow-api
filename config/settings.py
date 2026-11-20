@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "accounts",
     "projects",
+    "tasks",
 ]
 
 AUTH_USER_MODEL = "accounts.User"
