@@ -28,7 +28,8 @@ def test_list_shows_only_my_projects(as_user, project, owner, member, outsider):
     Project.objects.create(name="Secret", owner=outsider)
 
     for user in (owner, member):
-        names = [p["name"] for p in as_user(user).get(LIST_URL).json()]
+        results = as_user(user).get(LIST_URL).json()["results"]
+        names = [p["name"] for p in results]
         assert names == ["Website"]
 
 
